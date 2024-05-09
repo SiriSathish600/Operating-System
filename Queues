@@ -1,0 +1,76 @@
+#include <stdio.h>
+
+int arr[50];
+int rear = -1;
+int front = -1;
+int size = 5;
+
+void add(int n);
+void delete();
+void display();
+
+int main() {
+    add(1);
+    add(2);
+    add(3);
+    add(4);
+    add(5);
+    add(6);
+    display();
+    delete();
+    delete();
+     delete();
+    delete();
+     delete();
+    delete();
+   
+   
+    return 0;
+}
+
+void add(int n) {
+    if (rear == size - 1) {
+        printf("Queue is full\n");
+    } else if (front == -1 && rear == -1) {
+        rear = front = 0;
+        arr[rear] = n;
+    } else {
+        rear++;
+        arr[rear] = n;
+    }
+}
+
+void delete() {
+    if (front == -1) {
+        printf("Queue is empty");
+    } else if (front == rear) {
+        printf("The element deleted is %d", arr[front]);
+        front = rear = -1;
+    } else {
+        printf("The element deleted is %d\n", arr[front]);
+        front++;
+    }
+}
+
+void display() {
+    if (front == -1) {
+        printf("Queue is empty\n");
+    } else {
+        for (int i = front; i <= rear; i++) {
+            printf("%d\n", arr[i]); 
+        }
+    }
+}
+
+output
+Queue is full
+1
+2
+3
+4
+5
+The element deleted is 1
+The element deleted is 2
+The element deleted is 3
+The element deleted is 4
+The element deleted is 5Queue is empty
