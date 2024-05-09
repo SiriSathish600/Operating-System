@@ -1,0 +1,41 @@
+// Online C compiler to run C program online
+#include <stdio.h>
+int arr[50];
+int data,size;
+void linear_search();
+
+
+int main() {
+    linear_search();
+
+    return 0;
+}
+
+void linear_search(){
+    printf("enter the size of the array:");
+    scanf("%d", &size);
+    printf("enter the array elements:\n");
+    for(int i =0  ; i<size; i++){
+        scanf("%d", &arr[i]);
+    }
+    printf("enter the element u want to search:");
+    scanf("%d",&data);
+    int found =0;
+    for(int i =0 ; i<size; i++){
+        if(arr[i]==data){
+            printf("element %d found at %d location",data,i+1);
+            found = 1;
+            break;
+        }
+       
+    }
+     if(!found){
+            printf("element not found!");
+        }
+}
+
+enter the size of the array:5
+enter the array elements:
+1 2 3 4 5
+enter the element u want to search:4
+element 4 found at 4 location
