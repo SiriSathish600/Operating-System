@@ -1,0 +1,78 @@
+#include<stdio.h>
+
+// Structure to represent a process
+struct Process {
+    int process_id; // Process ID
+    int burst_time; // Burst Time
+    int remaining_time; // Remaining time for execution
+};
+
+// Function to perform Round Robin scheduling with a given time quantum
+void roundRobin(struct Process proc[], int n, int time_quantum) {
+    int total_waiting_time = 0, total_turnaround_time = 0;
+    int remaining_burst[n]; // Remaining burst time for each process
+    int current_time = 0; // Current time
+
+    // Initialize remaining burst time for each process
+    for (int i = 0; i < n; i++) {
+        remaining_burst[i] = proc[i].burst_time;
+    }
+
+    printf("\nGantt Chart:\n");
+    while (1) {
+        int done = 1; // Flag to check if all processes are done
+
+        for (int i = 0; i < n; i++) {
+            if (remaining_burst[i] > 0) {
+                done = 0; // Set done to 0 if there is still a process remaining
+
+                // Execute process for the given time quantum or its remaining burst time, whichever is smaller
+                if (remaining_burst[i] > time_quantum) {
+                    printf("| P%d ", proc[i].process_id);
+                    current_time += time_quantum;
+                    remaining_burst[i] -= time_quantum;
+                } else {
+                    printf("| P%d ", proc[i].process_id);
+                    current_time += remaining_burst[i];
+                    remaining_burst[i] = 0;
+
+                    // Calculate waiting time and turnaround time
+                    int waiting_time = current_time - proc[i].burst_time;
+                    total_waiting_time += waiting_time;
+                    total_turnaround_time += current_time;
+                }
+            }
+        }
+
+        if (done == 1)
+            break;
+    }
+
+    // Calculate average waiting and turnaround time
+    printf("|\n\nAverage Waiting Time: %.2f\n", (float) total_waiting_time / n);
+    printf("Average Turnaround Time: %.2f\n", (float) total_turnaround_time / n);
+}
+
+int main() {
+    // Example processes
+    struct Process proc[] = {{1, 10, 0}, {2, 5, 0}, {3, 8, 0}, {4, 6, 0}, {5, 7, 0}};
+    int n = sizeof(proc) / sizeof(proc[0]);
+    int time_quantum;
+
+    printf("Enter time quantum for Round Robin scheduling: ");
+    scanf("%d", &time_quantum);
+
+    // Perform Round Robin scheduling with the given time quantum
+    roundRobin(proc, n, time_quantum);
+
+    return 0;
+}
+
+OUTPUT
+Enter time quantum for Round Robin scheduling: 2
+
+Gantt Chart:
+| P1 | P2 | P3 | P4 | P5 | P1 | P2 | P3 | P4 | P5 | P1 | P2 | P3 | P4 | P5 | P1 | P3 | P5 | P1 |
+
+Average Waiting Time: 23.40
+Average Turnaround Time: 30.60
