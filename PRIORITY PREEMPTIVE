@@ -1,0 +1,64 @@
+#include<stdio.h>
+
+// Structure to represent a process
+struct Process {
+    int process_id; // Process ID
+    int burst_time; // Burst Time
+    int priority;   // Priority
+    int remaining_time; // Remaining time for execution
+};
+
+// Function to perform preemptive priority scheduling
+void preemptivePriorityScheduling(struct Process proc[], int n) {
+    int total_waiting_time = 0, total_turnaround_time = 0;
+    int current_time = 0;
+
+    printf("\nGantt Chart:\n");
+    while (1) {
+        int flag = 1;
+        for (int i = 0; i < n; i++) {
+            // If remaining time of process is greater than 0 and its arrival time is less than or equal to current time
+            if (proc[i].remaining_time > 0 && proc[i].burst_time > 0) {
+                printf("| P%d ", proc[i].process_id);
+                flag = 0;
+
+                // Execute the process for 1 time unit
+                proc[i].remaining_time--;
+                proc[i].burst_time--;
+                current_time++;
+
+                if (proc[i].burst_time == 0) {
+                    // Calculate waiting time and turnaround time
+                    total_waiting_time += current_time - proc[i].burst_time - proc[i].priority;
+                    total_turnaround_time += current_time - proc[i].priority;
+                }
+            }
+        }
+
+        // If all processes are done executing, break the loop
+        if (flag)
+            break;
+    }
+
+    // Calculate average waiting and turnaround time
+    printf("|\n\nAverage Waiting Time: %.2f\n", (float) total_waiting_time / n);
+    printf("Average Turnaround Time: %.2f\n", (float) total_turnaround_time / n);
+}
+
+int main() {
+    // Example processes
+    struct Process proc[] = {{1, 6, 2, 6}, {2, 8, 1, 8}, {3, 7, 2, 7}, {4, 3, 3, 3}, {5, 4, 1, 4}};
+    int n = sizeof(proc) / sizeof(proc[0]);
+
+    // Perform preemptive priority scheduling
+    preemptivePriorityScheduling(proc, n);
+
+    return 0;
+}
+
+OUTPUT
+Gantt Chart:
+| P1 | P2 | P3 | P4 | P5 | P1 | P2 | P3 | P4 | P5 | P1 | P2 | P3 | P4 | P5 | P1 | P2 | P3 | P5 | P1 | P2 | P3 | P1 | P2 | P3 | P2 | P3 | P2 |
+
+Average Waiting Time: 20.40
+Average Turnaround Time: 20.40
