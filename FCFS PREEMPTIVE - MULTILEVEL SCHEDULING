@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PROCESSES 100
+
+typedef struct {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int waiting_time;
+    int turnaround_time;
+    char type[10]; // "system" or "user"
+} Process;
+
+void sort_by_arrival_time(Process processes[], int n) {
+    int i, j;
+    Process temp;
+    for (i = 0; i < n - 1; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (processes[i].arrival_time > processes[j].arrival_time) {
+                temp = processes[i];
+                processes[i] = processes[j];
+                processes[j] = temp;
+            }
+        }
+    }
+}
+
+void fcfs(Process queue[], int n) {
+    int i;
+    int current_time = 0;
+
+    for (i = 0; i < n; i++) {
+        if (current_time < queue[i].arrival_time) {
+            current_time = queue[i].arrival_time;
+        }
+        queue[i].waiting_time = current_time - queue[i].arrival_time;
+        queue[i].turnaround_time = queue[i].waiting_time + queue[i].burst_time;
+        current_time += queue[i].burst_time;
+    }
+}
+
+void print_processes(Process processes[], int n) {
+    int i;
+    printf("PID\tType\tArrival\tBurst\tWaiting\tTurnaround\n");
+    for (i = 0; i < n; i++) {
+        printf("%d\t%s\t%d\t%d\t%d\t%d\n", processes[i].pid, processes[i].type, processes[i].arrival_time, processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+}
+
+float calculate_average(int times[], int n) {
+    int i;
+    int sum = 0;
+    for (i = 0; i < n; i++) {
+        sum += times[i];
+    }
+    return (float)sum / n;
+}
+
+int main() {
+    int n, i;
+    Process processes[MAX_PROCESSES];
+    Process system_queue[MAX_PROCESSES];
+    Process user_queue[MAX_PROCESSES];
+    int system_count = 0, user_count = 0;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("Enter process ID, type (system/user), arrival time, and burst time: ");
+        scanf("%d %s %d %d", &processes[i].pid, processes[i].type, &processes[i].arrival_time, &processes[i].burst_time);
+
+        if (strcmp(processes[i].type, "system") == 0) {
+            system_queue[system_count++] = processes[i];
+        } else if (strcmp(processes[i].type, "user") == 0) {
+            user_queue[user_count++] = processes[i];
+        } else {
+            printf("Invalid process type! Use 'system' or 'user'.\n");
+            i--; // Re-do the current iteration
+        }
+    }
+
+    sort_by_arrival_time(system_queue, system_count);
+    sort_by_arrival_time(user_queue, user_count);
+
+    fcfs(system_queue, system_count);
+    fcfs(user_queue, user_count);
+
+    printf("\nSystem Processes (Higher Priority):\n");
+    print_processes(system_queue, system_count);
+
+    int system_waiting_times[MAX_PROCESSES];
+    int system_turnaround_times[MAX_PROCESSES];
+    for (i = 0; i < system_count; i++) {
+        system_waiting_times[i] = system_queue[i].waiting_time;
+        system_turnaround_times[i] = system_queue[i].turnaround_time;
+    }
+    printf("Average waiting time: %.2f\n", calculate_average(system_waiting_times, system_count));
+    printf("Average turnaround time: %.2f\n", calculate_average(system_turnaround_times, system_count));
+
+    printf("\nUser Processes (Lower Priority):\n");
+    print_processes(user_queue, user_count);
+
+    int user_waiting_times[MAX_PROCESSES];
+    int user_turnaround_times[MAX_PROCESSES];
+    for (i = 0; i < user_count; i++) {
+        user_waiting_times[i] = user_queue[i].waiting_time;
+        user_turnaround_times[i] = user_queue[i].turnaround_time;
+    }
+    printf("Average waiting time: %.2f\n", calculate_average(user_waiting_times, user_count));
+    printf("Average turnaround time: %.2f\n", calculate_average(user_turnaround_times, user_count));
+
+    return 0;
+}
+
+
+output:
+
+Enter the number of processes: 4
+Enter process ID, type (system/user), arrival time, and burst time: 1 system 0 4
+Enter process ID, type (system/user), arrival time, and burst time: 2 system 0 3
+Enter process ID, type (system/user), arrival time, and burst time: 3 user 0 8
+Enter process ID, type (system/user), arrival time, and burst time: 4 system 10 5
+
+System Processes (Higher Priority):
+PID     Type    Arrival Burst   Waiting Turnaround
+1       system  0       4       0       4
+2       system  0       3       4       7
+4       system  10      5       0       5
+Average waiting time: 1.33
+Average turnaround time: 5.33
+
+User Processes (Lower Priority):
+PID     Type    Arrival Burst   Waiting Turnaround
+3       user    0       8       0       8
+Average waiting time: 0.00
+Average turnaround time: 8.00
